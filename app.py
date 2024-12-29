@@ -28,4 +28,4 @@ app.layout = create_layout(processed_data)
 register_callbacks(app, processed_data)
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8007)
+    app.run_server(debug=True)
