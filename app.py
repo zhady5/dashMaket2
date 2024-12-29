@@ -59,5 +59,5 @@ except Exception as e:
     ])
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    app.run_server(host='0.0.0.0', port=port, debug=False)
+    port = int(os.environ.get("PORT", 8888))
+    app.run_server( port=port, debug=False)
