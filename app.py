@@ -17,11 +17,24 @@ processed_data = process_data(channels, posts, reactions, subscribers, views)
 import signal
 import sys
 
+class SignalHandler:
+    def __init__(self, signum, handler):
+        self.signum = signum
+        self.handler = handler
+        self.old_handler = None
+
+    def __enter__(self):
+        self.old_handler = signal.getsignal(self.signum)
+        signal.signal(self.signum, self.handler)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        signal.signal(self.signum, self.old_handler)
+
 def sigterm_handler(signum, frame):
     print("Received SIGTERM, shutting down server...")
     sys.exit(0)
 
-signal.signal(signal.SIGTERM, sigterm_handler)
 
 # Настройка приложения Dash
 external_stylesheets = [
@@ -37,5 +50,8 @@ server = app.server
 app.layout = create_layout(processed_data)
 register_callbacks(app, processed_data)
 
-if __name__ == '__main__':
+with SignalHandler(signal.SIGTERM, sigterm_handler):
+    # Ваш код Dash здесь...
     app.run_server(debug=True)
+    #if __name__ == '__main__':
+    #    app.run_server(debug=True)
