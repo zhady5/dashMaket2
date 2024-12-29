@@ -1,5 +1,5 @@
 babel==2.11.0          
-blas==1.0             
+#blas==1.0             
 blinker==1.6.2           
 bottleneck==1.4.2           
 brotli==1.0.9           
