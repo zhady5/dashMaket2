@@ -13,6 +13,16 @@ from callbacks import register_callbacks
 channels, posts, reactions, subscribers, views = load_data()
 processed_data = process_data(channels, posts, reactions, subscribers, views)
 
+
+import signal
+import sys
+
+def sigterm_handler(signum, frame):
+    print("Received SIGTERM, shutting down server...")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, sigterm_handler)
+
 # Настройка приложения Dash
 external_stylesheets = [
     'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css',
