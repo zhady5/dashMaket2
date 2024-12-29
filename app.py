@@ -10,23 +10,54 @@ from functions import date_ago, convert_date, get_gradient_color, get_current_pr
 from layouts import create_layout
 from callbacks import register_callbacks
 
-channels, posts, reactions, subscribers, views = load_data()
-processed_data = process_data(channels, posts, reactions, subscribers, views)
+import os
+import sys
+import logging
+from dash import Dash
+import dash_bootstrap_components as dbc
+from flask import Flask
 
 
-# Настройка приложения Dash
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+try:
+    from layouts import create_layout
+    from callbacks import register_callbacks
+    from data_processing import load_data, process_data
+except ImportError as e:
+    logger.error(f"Error importing modules: {e}")
+    sys.exit(1)
+
+# Initialize the Flask app
+server = Flask(__name__)
+
 external_stylesheets = [
     'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css',
     'https://fonts.googleapis.com/css?family=Merriweather|Open+Sans&display=swap',
     'Desktop/notebooks/custom-styles.css'
 ]
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets )
-# Макет приложения
-server = app.server
+# Initialize the Dash app
+app = Dash(__name__, server=server, external_stylesheets=external_stylesheets)
 
-app.layout = create_layout(processed_data)
-register_callbacks(app, processed_data)
+try:
+    # Load and process data
+    channels, posts, reactions, subscribers, views = load_data()
+    processed_data = process_data(channels, posts, reactions, subscribers, views)
+
+    # Create the app layout
+    app.layout = create_layout(processed_data)
+
+    # Register callbacks
+    register_callbacks(app, processed_data)
+except Exception as e:
+    logger.error(f"Error setting up the application: {e}")
+    app.layout = dbc.Container([
+        dbc.Alert("An error occurred while setting up the application. Please check the logs.", color="danger")
+    ])
 
 if __name__ == '__main__':
-     app.run_server(debug=True, port=8000)
+    port = int(os.environ.get("PORT", 8080))
+    app.run_server(host='0.0.0.0', port=port, debug=False)
