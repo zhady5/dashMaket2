@@ -35,6 +35,7 @@ def sigterm_handler(signum, frame):
     print("Received SIGTERM, shutting down server...")
     sys.exit(0)
 
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 # Настройка приложения Dash
 external_stylesheets = [
@@ -50,8 +51,5 @@ server = app.server
 app.layout = create_layout(processed_data)
 register_callbacks(app, processed_data)
 
-with SignalHandler(signal.SIGTERM, sigterm_handler):
-    # Ваш код Dash здесь...
-    app.run_server(debug=True)
-    #if __name__ == '__main__':
-    #    app.run_server(debug=True)
+if __name__ == '__main__':
+     app.run_server(debug=True)
